@@ -32,7 +32,8 @@ def csv_to_txt_multi_directory():
         "../data/202508-citibike-tripdata"
     ]    
     input_stream = MultiDirectoryCSVStream(directories, "*.csv", formatter, has_header=True)    
-    output_path = "../output/citibike_multi_dir_output.txt"
+    os.makedirs("./output", exist_ok=True)
+    output_path = "./output/citibike_multi_dir_output.txt"
 
     with open(output_path, 'w') as f:
         count = 0
@@ -63,8 +64,8 @@ def csv_to_txt_with_fileoutputstream():
     formatter = CitiBikeDataFormatter(CitiBikeEventTypeClassifier())    
     directories = ["../data/202506-citibike-tripdata"]
     input_stream = MultiDirectoryCSVStream(directories, "*.csv", formatter, has_header=True)
-    os.makedirs("../output", exist_ok=True)
-    output_stream = FileOutputStream("../output", "citibike_fileoutputstream.txt", is_async=False)
+    os.makedirs("./output", exist_ok=True)
+    output_stream = FileOutputStream("./output", "citibike_fileoutputstream.txt", is_async=False)
     
     count = 0
     for line in input_stream:
