@@ -37,17 +37,22 @@ class CitiBikeDataFormatter(DataFormatter):
         """
         Parses a CSV line into an event payload dictionary.
         """
-        if not self._headers:
-            raise Exception("Headers must be set before parsing events")
-        
-        # Remove trailing newline and split by comma
         raw_data = raw_data.strip()
         values = raw_data.split(',')
         
+        if not self._headers:
+            if self.is_header_row(values):
+                self._headers = values
+                return None
+            else:
+                raise Exception("Headers must be set before parsing events")
+        
+        if values == self._headers:
+            return None
+
         if len(values) != len(self._headers):
             raise Exception(f"Data mismatch: expected {len(self._headers)} values but got {len(values)}")
         
-        # Create payload dictionary
         payload = {}
         for i, header in enumerate(self._headers):
             value = values[i]
@@ -61,6 +66,18 @@ class CitiBikeDataFormatter(DataFormatter):
                 payload[header] = value
         
         return payload
+    
+    def is_header_row(self, values):
+        """
+        Check if a row is likely to be a header row based on expected column names.
+        """
+        expected_headers = ['ride_id', 'rideable_type', 'started_at', 'ended_at', 
+                           'start_station_name', 'start_station_id', 'end_station_name', 
+                           'end_station_id', 'start_lat', 'start_lng', 'end_lat', 
+                           'end_lng', 'member_casual']
+        
+        matching_headers = sum(1 for header in values if header in expected_headers)
+        return matching_headers >= 5
     
     def get_event_timestamp(self, event_payload: dict):
         """

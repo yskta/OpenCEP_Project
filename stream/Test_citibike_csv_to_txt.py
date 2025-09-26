@@ -40,19 +40,26 @@ def csv_to_txt_multi_directory():
         current_file = None
         
         for line in input_stream:
-            event = Event(line, formatter)            
-            f.write(f"Event {count + 1}:\n")
-            f.write(f"  Type: {event.type}\n")
-            f.write(f"  Timestamp: {event.timestamp}\n")
-            f.write(f"  Ride ID: {event.payload.get('ride_id', 'N/A')}\n")
-            f.write(f"  Start Station: {event.payload.get('start_station_name', 'N/A')}\n")
-            f.write(f"  End Station: {event.payload.get('end_station_name', 'N/A')}\n")
-            f.write(f"  Member Type: {event.payload.get('member_casual', 'N/A')}\n")
-            f.write("-" * 50 + "\n")
-            count += 1
-            if count % 5 == 0 and count >= 15:
-                break
-    
+            try:
+                parsed = formatter.parse_event(line)
+                if parsed is None:
+                    print("Skipping header row")
+                    continue
+                event = Event(line, formatter)           
+                f.write(f"Event {count + 1}:\n")
+                f.write(f"  Type: {event.type}\n")
+                f.write(f"  Timestamp: {event.timestamp}\n")
+                f.write(f"  Ride ID: {event.payload.get('ride_id', 'N/A')}\n")
+                f.write(f"  Start Station: {event.payload.get('start_station_name', 'N/A')}\n")
+                f.write(f"  End Station: {event.payload.get('end_station_name', 'N/A')}\n")
+                f.write(f"  Member Type: {event.payload.get('member_casual', 'N/A')}\n")
+                f.write("-" * 50 + "\n")
+                count += 1
+            except Exception as e:
+                print(f"Error processing line: {e}")
+                print(f"Line data: {line}")
+                continue
+
     print(f"Wrote {count} events to {output_path}")
 
 def csv_to_txt_with_fileoutputstream():
@@ -69,13 +76,23 @@ def csv_to_txt_with_fileoutputstream():
     
     count = 0
     for line in input_stream:
-        # Parse the line into an event
-        event = Event(line, formatter)        
-        output_text = f"Event {count + 1}: Type={event.type}, Station={event.payload.get('start_station_name', 'N/A')}, Time={event.timestamp}\n"        
-        output_stream.add_item(output_text)
-        count += 1
-        if count >= 10:
-            break
+        try:
+            # First parse to check if it's a header
+            parsed = formatter.parse_event(line)
+            if parsed is None:
+                print("Skipping header row")
+                continue
+                
+            # Parse the line into an event
+            event = Event(line, formatter)        
+            output_text = f"Event {count + 1}: Type={event.type}, Station={event.payload.get('start_station_name', 'N/A')}, Time={event.timestamp}\n"        
+            output_stream.add_item(output_text)
+            count += 1
+            if count >= 10:
+                break
+        except Exception as e:
+            print(f"Error processing line: {e}")
+            continue
     
     # Close the stream to write all data
     output_stream.close()
