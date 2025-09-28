@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  redis-statics:
+  redis-stats:
     container_name: redis_statics_server
     image: redis:latest
     ports: 
