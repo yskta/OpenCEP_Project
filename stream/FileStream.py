@@ -3,6 +3,10 @@ import os
 from stream.Stream import InputStream, OutputStream
 
 
+# FileInputStream:
+# - Inherits from InputStream
+# - Reads the entire file in the constructor and stores each line in an internal queue (_stream)
+# - Calls close() immediately after reading is complete
 class FileInputStream(InputStream):
     """
     Reads the objects from a predefined input file.
@@ -16,6 +20,11 @@ class FileInputStream(InputStream):
         self.close()
 
 
+#   FileOutputStream:Inherits from OutputStream
+# - Two write modes:
+    # - Asynchronous mode (is_async=True): Writes items to the file immediately upon receiving them
+    # - Synchronous mode (is_async=False): Buffers items and writes them all at once when close() is called
+# - The close() method, in synchronous mode, writes all buffer contents before closing the file
 class FileOutputStream(OutputStream):
     """
     Writes the objects into a predefined output file.
