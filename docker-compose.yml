@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  redis-statics:
+    container_name: redis_statics_server
+    image: redis:latest
+    ports: 
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis_data:
+    driver: local
