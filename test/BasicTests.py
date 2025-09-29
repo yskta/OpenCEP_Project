@@ -37,13 +37,13 @@ def hotpathPatternSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT
             KCIndexCondition(names={'a'},
                             getattr_func=lambda x: x["bikeid"],
                             relation_op=lambda x, y: x == y,
-                            offset=-1),
+                            offset=1),
             SimpleCondition(Variable("b", lambda x: x["end station id"]),
                             relation_op=lambda x: x in {7, 8, 9}),
             KCIndexCondition(names={'a'},
                             getattr_func=lambda x: (x["start station id"], x["end station id"]),
-                            relation_op=lambda x, y: x[0] == y[1],
-                            offset=-1),
+                            relation_op=lambda x, y: x[1] == y[0],
+                            offset=1),
             KCValueCondition(names={'a'}, getattr_func=lambda x: x["bikeid"],
                              relation_op=lambda x, y: x == y,
                              value=Variable("b", lambda x: x["bikeid"]))
@@ -63,7 +63,9 @@ def citibikeBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_
 
     pattern = Pattern(
         SeqOperator(KleeneClosureOperator(PrimitiveEventStructure("BikeTrip", "a"))),
-        EqCondition(Variable("a", lambda x: x["usertype"]), "Customer"),
+        KCValueCondition(names={'a'}, getattr_func=lambda x: x["usertype"],
+                         relation_op=lambda x, y: x == y,
+                         value="Customer"),
         timedelta(hours=1)
     )
 

@@ -7,9 +7,9 @@ class CitiBikeEventTypeClassifier(EventTypeClassifier):
     """
     def get_event_type(self, event_payload: dict):
         """
-        Returns the event type based on the rideable_type field.
+        Returns the event type based on the bikeid field.
         """
-        return event_payload.get("rideable_type", "unknown")
+        return event_payload.get("bikeid", "unknown")
 
 
 class CitiBikeDataFormatter(DataFormatter):
