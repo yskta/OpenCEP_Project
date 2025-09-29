@@ -89,14 +89,7 @@ class CitiBikeDataFormatter(DataFormatter):
             raise Exception("No started_at timestamp found in event")
         
         try:
-            # Parse timestamp with milliseconds
             dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")
-            # Convert to Unix timestamp in milliseconds
-            return int(dt.timestamp() * 1000)
+            return dt
         except ValueError:
-            # Try without milliseconds
-            try:
-                dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
-                return int(dt.timestamp() * 1000)
-            except ValueError:
-                raise Exception(f"Invalid timestamp format: {timestamp_str}")
+            raise Exception(f"Invalid timestamp format: {timestamp_str}")

@@ -15,6 +15,7 @@ class StatisticsCollector:
         Currently only arrival rates statistics handles the events
         """
         self.update_statistics_by_type(StatisticsTypes.ARRIVAL_RATES, event)
+        # Todo:updateする統計情報を追加する
 
     def get_statistics(self):
         """

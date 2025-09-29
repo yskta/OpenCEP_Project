@@ -15,7 +15,8 @@ class StatisticsFactory:
         predefined_statistics = None
         if pattern.statistics and stat_type in pattern.statistics:
             predefined_statistics = copy.deepcopy(pattern.statistics[stat_type])
-
+        
+        # Todo: edit here after add StatisticsTypes
         if stat_type == StatisticsTypes.ARRIVAL_RATES:
             return ArrivalRatesStatistics(statistics_time_window, pattern, predefined_statistics)
         if stat_type == StatisticsTypes.SELECTIVITY_MATRIX:

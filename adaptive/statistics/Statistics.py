@@ -179,3 +179,5 @@ class SelectivityStatistics(Statistics):
                             self.__indices_to_atomic_condition_map[(i, j)].append(atomic_condition_id)
                         else:
                             self.__indices_to_atomic_condition_map[(i, j)] = [atomic_condition_id]
+
+# Todo: add Statics Class after adding StatsType
