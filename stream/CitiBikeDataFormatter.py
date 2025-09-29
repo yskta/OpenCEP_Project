@@ -57,7 +57,7 @@ class CitiBikeDataFormatter(DataFormatter):
         for i, header in enumerate(self._headers):
             value = values[i]
             # Try to convert numeric fields
-            if header in ['start_lat', 'start_lng', 'end_lat', 'end_lng']:
+            if header in ['start station latitude', 'start station longitude', 'end station latitude', 'end station longitude']:
                 try:
                     payload[header] = float(value)
                 except ValueError:
@@ -71,22 +71,22 @@ class CitiBikeDataFormatter(DataFormatter):
         """
         Check if a row is likely to be a header row based on expected column names.
         """
-        expected_headers = ['ride_id', 'rideable_type', 'started_at', 'ended_at', 
-                           'start_station_name', 'start_station_id', 'end_station_name', 
-                           'end_station_id', 'start_lat', 'start_lng', 'end_lat', 
-                           'end_lng', 'member_casual']
+        expected_headers = ["tripduration","starttime","stoptime","start station id",
+                            "start station name","start station latitude","start station longitude",
+                            "end station id","end station name","end station latitude",
+                            "end station longitude","bikeid","usertype","birth year","gender"]
         
         matching_headers = sum(1 for header in values if header in expected_headers)
         return matching_headers >= 5
     
     def get_event_timestamp(self, event_payload: dict):
         """
-        Extracts timestamp from the started_at field.
+        Extracts timestamp from the starttime field.
         Format: YYYY-MM-DD HH:MM:SS.mmm
         """
-        timestamp_str = event_payload.get("started_at")
+        timestamp_str = event_payload.get("starttime")
         if not timestamp_str:
-            raise Exception("No started_at timestamp found in event")
+            raise Exception("No starttime timestamp found in event")
         
         try:
             # Parse timestamp with milliseconds

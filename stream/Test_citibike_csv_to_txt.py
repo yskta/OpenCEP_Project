@@ -27,13 +27,11 @@ def csv_to_txt_multi_directory():
     
     formatter = CitiBikeDataFormatter(CitiBikeEventTypeClassifier())    
     directories = [
-        "../data/202506-citibike-tripdata",
-        "../data/202507-citibike-tripdata",
-        "../data/202508-citibike-tripdata"
+        "data/2013-citibike-tripdata"
     ]    
     input_stream = MultiDirectoryCSVStream(directories, "*.csv", formatter, has_header=True)    
-    os.makedirs("./output", exist_ok=True)
-    output_path = "./output/citibike_multi_dir_output.txt"
+    os.makedirs("stream/output", exist_ok=True)
+    output_path = "stream/output/citibike_multi_dir_output.txt"
 
     with open(output_path, 'w') as f:
         count = 0
@@ -49,10 +47,10 @@ def csv_to_txt_multi_directory():
                 f.write(f"Event {count + 1}:\n")
                 f.write(f"  Type: {event.type}\n")
                 f.write(f"  Timestamp: {event.timestamp}\n")
-                f.write(f"  Ride ID: {event.payload.get('ride_id', 'N/A')}\n")
-                f.write(f"  Start Station: {event.payload.get('start_station_name', 'N/A')}\n")
-                f.write(f"  End Station: {event.payload.get('end_station_name', 'N/A')}\n")
-                f.write(f"  Member Type: {event.payload.get('member_casual', 'N/A')}\n")
+                f.write(f"  Bike ID: {event.payload.get('bikeid', 'N/A')}\n")
+                f.write(f"  Start Station: {event.payload.get('start station name', 'N/A')}\n")
+                f.write(f"  End Station: {event.payload.get('end station name', 'N/A')}\n")
+                f.write(f"  User Type: {event.payload.get('usertype', 'N/A')}\n")
                 f.write("-" * 50 + "\n")
                 count += 1
             except Exception as e:
@@ -69,10 +67,10 @@ def csv_to_txt_with_fileoutputstream():
     print("\n=== CSV to TXT with FileOutputStream ===")
     
     formatter = CitiBikeDataFormatter(CitiBikeEventTypeClassifier())    
-    directories = ["../data/202506-citibike-tripdata"]
+    directories = ["data/2013-citibike-tripdata"]
     input_stream = MultiDirectoryCSVStream(directories, "*.csv", formatter, has_header=True)
-    os.makedirs("./output", exist_ok=True)
-    output_stream = FileOutputStream("./output", "citibike_fileoutputstream.txt", is_async=False)
+    os.makedirs("stream/output", exist_ok=True)
+    output_stream = FileOutputStream("stream/output", "citibike_fileoutputstream.txt", is_async=False)
     
     count = 0
     for line in input_stream:
@@ -85,7 +83,7 @@ def csv_to_txt_with_fileoutputstream():
                 
             # Parse the line into an event
             event = Event(line, formatter)        
-            output_text = f"Event {count + 1}: Type={event.type}, Station={event.payload.get('start_station_name', 'N/A')}, Time={event.timestamp}\n"        
+            output_text = f"Event {count + 1}: Type={event.type}, Station={event.payload.get('start station name', 'N/A')}, Time={event.timestamp}\n"        
             output_stream.add_item(output_text)
             count += 1
             if count >= 10:
