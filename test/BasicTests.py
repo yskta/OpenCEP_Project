@@ -4,9 +4,69 @@ from condition.Condition import Variable, TrueCondition, BinaryCondition, Simple
 from condition.CompositeCondition import AndCondition
 from condition.BaseRelationCondition import EqCondition, GreaterThanCondition, GreaterThanEqCondition, \
     SmallerThanEqCondition
-from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure
+from condition.KCCondition import KCIndexCondition
+from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, KleeneClosureOperator
 from base.Pattern import Pattern
+from stream.CitiBikeDataFormatter import CitiBikeDataFormatter, CitiBikeEventTypeClassifier
+from stream.MultiFileCSVStream import MultiDirectoryCSVStream, CSVFileInputStream
 
+"""
+Citibike datas, dataformatter and event stream
+"""
+citibikeEventDirectories = [
+    "../data/202506-citibike-tripdata",
+    "../data/202507-citibike-tripdata",
+    "../data/202508-citibike-tripdata"
+]
+CITIBIKE_DATA_FORMATTER = CitiBikeDataFormatter(CitiBikeEventTypeClassifier())  
+citibikeEventStream = MultiDirectoryCSVStream(citibikeEventDirectories, "*.csv", CITIBIKE_DATA_FORMATTER, has_header=True)
+singleCitibikeEventStream = CSVFileInputStream("../data/202506-citibike-tripdata/202506-citibike-tripdata_1.csv", CITIBIKE_DATA_FORMATTER, has_header=True)
+
+
+def hotpathPatternSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
+                            test_name = "hotpath"):
+    """
+    PATTERN SEQ (BikeTrip+ a[], BikeTrip b)
+    WHERE a[i+1].bike = a[i].bike AND b.end in {7,8,9}
+    AND a[last].bike = b.bike AND a[i+1].start = a[i].end
+    WITHIN 1h
+    RETURN (a[1].start, a[i].end, b.end)
+    """
+
+    pattern = Pattern(
+        SeqOperator(KleeneClosureOperator(PrimitiveEventStructure("BikeTrip", "a")), PrimitiveEventStructure("BikeTrip", "b")),
+        AndCondition(
+            KCIndexCondition(names={'a'},
+                            getattr_func=lambda x: x["bikeid"],
+                            relation_op=lambda x, y: x == y,
+                            offset=-1),
+            SimpleCondition(Variable("b", lambda x: x["end_station_id"]),
+                            relation_op=lambda x: x in {7, 8, 9}),
+            KCIndexCondition(names={'a'},
+                            getattr_func=lambda x: (x["start"], x["end"]),
+                            relation_op=lambda x, y: x[0] == y[1],
+                            offset=-1)
+        ),
+        timedelta(hours=1)
+    )
+
+    runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=citibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
+
+def citibikeBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
+                            test_name = "citibike"):
+    """
+    PATTERN SEQ (BikeTrip a)
+    WHERE a.member_casual = casual
+    WITHIN 1h
+    """
+
+    pattern = Pattern(
+        SeqOperator(KleeneClosureOperator(PrimitiveEventStructure("BikeTrip", "a"))),
+        EqCondition(Variable("a", lambda x: x["member_casual"]), "casual"),
+        timedelta(hours=1)
+    )
+
+    runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=singleCitibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
 
 def oneArgumentsearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
                           test_name = "one"):

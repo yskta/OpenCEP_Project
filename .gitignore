@@ -2,3 +2,4 @@ myenv/*
 requirement/
 *.pyc
 data/*
+stream/output/*
