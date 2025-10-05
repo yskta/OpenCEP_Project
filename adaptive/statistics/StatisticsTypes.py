@@ -7,3 +7,4 @@ class StatisticsTypes(Enum):
     """
     ARRIVAL_RATES = 1
     SELECTIVITY_MATRIX = 2
+    #Todo:add StatisticsTypes

@@ -9,7 +9,8 @@ class CitiBikeEventTypeClassifier(EventTypeClassifier):
         """
         Returns the event type based on the rideable_type field.
         """
-        return event_payload.get("rideable_type", "unknown")
+        # memo：ここの変数をいじったら検出できるイベントの種類が変わる
+        return event_payload.get("usertype", "unknown")
 
 
 class CitiBikeDataFormatter(DataFormatter):
@@ -57,7 +58,7 @@ class CitiBikeDataFormatter(DataFormatter):
         for i, header in enumerate(self._headers):
             value = values[i]
             # Try to convert numeric fields
-            if header in ['start_lat', 'start_lng', 'end_lat', 'end_lng']:
+            if header in ['start station latitude', 'start station longitude', 'end station latitude', 'end station longitude']:
                 try:
                     payload[header] = float(value)
                 except ValueError:
@@ -66,37 +67,32 @@ class CitiBikeDataFormatter(DataFormatter):
                 payload[header] = value
         
         return payload
-    
     def is_header_row(self, values):
         """
         Check if a row is likely to be a header row based on expected column names.
         """
-        expected_headers = ['ride_id', 'rideable_type', 'started_at', 'ended_at', 
-                           'start_station_name', 'start_station_id', 'end_station_name', 
-                           'end_station_id', 'start_lat', 'start_lng', 'end_lat', 
-                           'end_lng', 'member_casual']
-        
+        expected_headers = ['tripduration','starttime','stoptime','start station id','start station name','start station latitude','start station longitude','end station id','end station name','end station latitude','end station longitude','bikeid','usertype','birth year','gender']
+
         matching_headers = sum(1 for header in values if header in expected_headers)
         return matching_headers >= 5
     
     def get_event_timestamp(self, event_payload: dict):
         """
-        Extracts timestamp from the started_at field.
-        Format: YYYY-MM-DD HH:MM:SS.mmm
+        Extracts timestamp from the starttime field.
+        Format: YYYY-MM-DD HH:MM:SS
         """
-        timestamp_str = event_payload.get("started_at")
+        timestamp_str = event_payload.get("starttime")
         if not timestamp_str:
-            raise Exception("No started_at timestamp found in event")
+            raise Exception("No starttime timestamp found in event")
         
         try:
-            # Parse timestamp with milliseconds
-            dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")
-            # Convert to Unix timestamp in milliseconds
-            return int(dt.timestamp() * 1000)
+            # Try without milliseconds first (2013 format)
+            dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+            return dt
         except ValueError:
-            # Try without milliseconds
             try:
-                dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
-                return int(dt.timestamp() * 1000)
+                # Try with milliseconds as fallback
+                dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")
+                return dt
             except ValueError:
                 raise Exception(f"Invalid timestamp format: {timestamp_str}")
