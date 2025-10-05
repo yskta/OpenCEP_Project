@@ -26,11 +26,11 @@ def test_basic_stats():
     # Create a pattern
     pattern = Pattern(
         SeqOperator(
-            PrimitiveEventStructure("classic_bike", "a"),
-            PrimitiveEventStructure("electric_bike", "b")
+            PrimitiveEventStructure("Subscriber", "a"),
+            PrimitiveEventStructure("Customer", "b")
         ),
         None,
-        timedelta(minutes=5)
+        timedelta(minutes=100)
     )
 
     # Initialize statistics collector
@@ -48,7 +48,7 @@ def test_basic_stats():
 
     # Setup CitiBike data stream
     formatter = CitiBikeDataFormatter(CitiBikeEventTypeClassifier())    
-    directories = ["data/202506-citibike-tripdata"]
+    directories = ["data/2013-citibike-tripdata"]
     input_stream = MultiDirectoryCSVStream(directories, "*.csv", formatter, has_header=True)
 
     print("Processing events...")
@@ -62,7 +62,7 @@ def test_basic_stats():
             event = Event(line, formatter)
             stats_collector.handle_event(event)
             event_count += 1    
-            if event_count >= 100:
+            if event_count >= 1000:
                 break
 
         except Exception as e:
