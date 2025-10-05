@@ -9,7 +9,8 @@ class CitiBikeEventTypeClassifier(EventTypeClassifier):
         """
         Returns the event type based on the bikeid field.
         """
-        return event_payload.get("bikeid", "unknown")
+        # memo：ここの変数をいじったら検出できるイベントの種類が変わる
+        return event_payload.get("usertype", "unknown")
 
 
 class CitiBikeDataFormatter(DataFormatter):
@@ -66,37 +67,32 @@ class CitiBikeDataFormatter(DataFormatter):
                 payload[header] = value
         
         return payload
-    
     def is_header_row(self, values):
         """
         Check if a row is likely to be a header row based on expected column names.
         """
-        expected_headers = ["tripduration","starttime","stoptime","start station id",
-                            "start station name","start station latitude","start station longitude",
-                            "end station id","end station name","end station latitude",
-                            "end station longitude","bikeid","usertype","birth year","gender"]
-        
+        expected_headers = ['tripduration','starttime','stoptime','start station id','start station name','start station latitude','start station longitude','end station id','end station name','end station latitude','end station longitude','bikeid','usertype','birth year','gender']
+
         matching_headers = sum(1 for header in values if header in expected_headers)
         return matching_headers >= 5
     
     def get_event_timestamp(self, event_payload: dict):
         """
         Extracts timestamp from the starttime field.
-        Format: YYYY-MM-DD HH:MM:SS.mmm
+        Format: YYYY-MM-DD HH:MM:SS
         """
         timestamp_str = event_payload.get("starttime")
         if not timestamp_str:
             raise Exception("No starttime timestamp found in event")
         
         try:
-            # Parse timestamp with milliseconds
-            dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")
-            # Convert to Unix timestamp in milliseconds
-            return int(dt.timestamp() * 1000)
+            # Try without milliseconds first (2013 format)
+            dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+            return dt
         except ValueError:
-            # Try without milliseconds
             try:
-                dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
-                return int(dt.timestamp() * 1000)
+                # Try with milliseconds as fallback
+                dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")
+                return dt
             except ValueError:
                 raise Exception(f"Invalid timestamp format: {timestamp_str}")
