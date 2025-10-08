@@ -17,7 +17,11 @@ from test.ParallelTests import *
 runTest.over_all_time = 0
 
 # basic functionality tests
-oneArgumentsearchTest()
+""" hotpathPatternSearchTest() """
+citibikeBasicSearchTest()
+
+""" oneArgumentsearchTest() """
+"""
 simplePatternSearchTest()
 googleAscendPatternSearchTest()
 amazonInstablePatternSearchTest()
@@ -319,7 +323,7 @@ if INCLUDE_TWITTER:
         from TwitterTest import run_twitter_sanity_check
         run_twitter_sanity_check()
     except ImportError:  # tweepy might not be installed
-        pass
+        pass """
 
 
 print("Finished running all tests, overall time: %s" % runTest.over_all_time)

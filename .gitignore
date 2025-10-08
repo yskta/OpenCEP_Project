@@ -2,3 +2,6 @@ myenv/*
 requirement/
 *.pyc
 data/*
+stream/output/*
+ouput/*
+.vscode/*

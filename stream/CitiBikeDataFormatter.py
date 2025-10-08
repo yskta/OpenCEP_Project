@@ -7,7 +7,7 @@ class CitiBikeEventTypeClassifier(EventTypeClassifier):
     """
     def get_event_type(self, event_payload: dict):
         """
-        Returns the event type based on the rideable_type field.
+        Returns the event type based on the bikeid field.
         """
         # memo：ここの変数をいじったら検出できるイベントの種類が変わる
         return event_payload.get("usertype", "unknown")

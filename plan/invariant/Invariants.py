@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from collections import Callable
+from collections.abc import Callable
 
 from base.Pattern import Pattern
 from misc.LegacyStatistics import MissingStatisticsException
