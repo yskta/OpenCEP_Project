@@ -53,6 +53,24 @@ def hotpathPatternSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT
 
     runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=citibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
 
+def citibikeKCBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
+                            test_name = "citibike"):
+    """
+    PATTERN SEQ (BikeTrip a)
+    WHERE a.usertype = Customer
+    WITHIN 1h
+    """
+
+    pattern = Pattern(
+        SeqOperator(KleeneClosureOperator(PrimitiveEventStructure("BikeTrip", "a"))),
+        KCValueCondition(names={'a'}, getattr_func=lambda x: x["usertype"],
+                         relation_op=lambda x, y: x == y,
+                         value="Customer"),
+        timedelta(hours=1)
+    )
+
+    runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=singleCitibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
+
 def citibikeBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
                             test_name = "citibike"):
     """
@@ -61,12 +79,9 @@ def citibikeBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_
     WITHIN 1h
     """
 
-    #TODO: Use something else than BikeTrip for pattern, something from the file. Check example from NASDAQLONG.txt
     pattern = Pattern(
-        SeqOperator(KleeneClosureOperator(PrimitiveEventStructure("BikeTrip", "a"))),
-        KCValueCondition(names={'a'}, getattr_func=lambda x: x["usertype"],
-                         relation_op=lambda x, y: x == y,
-                         value="Customer"),
+        SeqOperator(PrimitiveEventStructure("BikeTrip", "a")),
+        EqCondition(Variable("a", lambda x: x["usertype"]), "Customer"),
         timedelta(hours=1)
     )
 
