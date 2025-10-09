@@ -5,3 +5,4 @@ data/*
 stream/output/*
 ouput/*
 .vscode/*
+test/Matches/*

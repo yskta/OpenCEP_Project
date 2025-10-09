@@ -1,5 +1,6 @@
 from datetime import datetime
 from base.DataFormatter import DataFormatter, EventTypeClassifier
+import hashlib
 
 class CitiBikeEventTypeClassifier(EventTypeClassifier):
     """
@@ -65,6 +66,9 @@ class CitiBikeDataFormatter(DataFormatter):
                     payload[header] = value
             else:
                 payload[header] = value
+
+        key = f"{payload['bikeid']}-{payload['starttime']}-{payload['stoptime']}"
+        payload["tripId"] = hashlib.md5(key.encode()).hexdigest()[:12]
         
         return payload
     def is_header_row(self, values):

@@ -90,6 +90,13 @@ class CSVFileInputStream(InputStream):
         """
         self._cleanup()
 
+    def duplicate(self):
+        return CSVFileInputStream(
+            self._file_path,
+            self._data_formatter,
+            self._has_header
+        )
+
 class MultiFileCSVStream(InputStream):
     """
     Reads events from multiple CSV files in a directory.
@@ -194,7 +201,14 @@ class MultiFileCSVStream(InputStream):
         Get the list of file paths that will be processed.
         """
         return self._file_paths.copy()
-
+    
+    def duplicate(self):
+        return MultiFileCSVStream(
+            self._directory_path,
+            self._pattern,
+            self._data_formatter,
+            self._has_header
+        )
 
 class MultiDirectoryCSVStream(InputStream):
     """
@@ -278,3 +292,11 @@ class MultiDirectoryCSVStream(InputStream):
         if self._current_stream:
             self._current_stream.close()
         super().close()
+
+    def duplicate(self):
+        return MultiDirectoryCSVStream(
+            self._directory_paths,
+            self._pattern,
+            self._data_formatter,
+            self._has_header
+        )

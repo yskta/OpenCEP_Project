@@ -61,15 +61,16 @@ def citibikeBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_
     WITHIN 1h
     """
 
+    #TODO: Use something else than BikeTrip for pattern, something from the file. Check example from NASDAQLONG.txt
     pattern = Pattern(
-        SeqOperator(KleeneClosureOperator(PrimitiveEventStructure("BikeTrip", "a"))),
+        SeqOperator(KleeneClosureOperator(PrimitiveEventStructure("Customer", "a"))),
         KCValueCondition(names={'a'}, getattr_func=lambda x: x["usertype"],
                          relation_op=lambda x, y: x == y,
                          value="Customer"),
         timedelta(hours=1)
     )
 
-    runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=citibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
+    runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=singleCitibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
 
 def oneArgumentsearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
                           test_name = "one"):
