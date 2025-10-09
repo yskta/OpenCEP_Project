@@ -18,7 +18,7 @@ citibikeEventDirectories = [
 ]
 CITIBIKE_DATA_FORMATTER = CitiBikeDataFormatter(CitiBikeEventTypeClassifier())  
 citibikeEventStream = MultiDirectoryCSVStream(citibikeEventDirectories, "*.csv", CITIBIKE_DATA_FORMATTER, has_header=True)
-singleCitibikeEventStream = CSVFileInputStream("data/2013-citibike-tripdata/201306-citibike-tripdata.csv", CITIBIKE_DATA_FORMATTER, has_header=True)
+singleCitibikeEventStream = CSVFileInputStream("data/2013-citibike-tripdata/short-tripdata.csv", CITIBIKE_DATA_FORMATTER, has_header=True)
 
 
 def hotpathPatternSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
@@ -63,7 +63,7 @@ def citibikeBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_
 
     #TODO: Use something else than BikeTrip for pattern, something from the file. Check example from NASDAQLONG.txt
     pattern = Pattern(
-        SeqOperator(KleeneClosureOperator(PrimitiveEventStructure("Customer", "a"))),
+        SeqOperator(KleeneClosureOperator(PrimitiveEventStructure("BikeTrip", "a"))),
         KCValueCondition(names={'a'}, getattr_func=lambda x: x["usertype"],
                          relation_op=lambda x, y: x == y,
                          value="Customer"),

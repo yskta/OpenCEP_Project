@@ -11,7 +11,7 @@ class CitiBikeEventTypeClassifier(EventTypeClassifier):
         Returns the event type based on the bikeid field.
         """
         # memo：ここの変数をいじったら検出できるイベントの種類が変わる
-        return event_payload.get("usertype", "unknown")
+        return "BikeTrip"
 
 
 class CitiBikeDataFormatter(DataFormatter):
