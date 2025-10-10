@@ -18,7 +18,8 @@ from stream import (
     MultiDirectoryCSVStream,
     CitiBikeDataFormatter,
     CitiBikeEventTypeClassifier,
-    FileOutputStream
+    FileOutputStream,
+    CSVFileInputStream
 )
 
 def csv_to_txt_multi_directory():
@@ -29,17 +30,18 @@ def csv_to_txt_multi_directory():
     
     formatter = CitiBikeDataFormatter(CitiBikeEventTypeClassifier())    
     directories = [
-        "../data/2013-citibike-tripdata",
+        "data/2013-citibike-tripdata",
     ]
     input_stream = MultiDirectoryCSVStream(directories, "*.csv", formatter, has_header=True)    
     os.makedirs("stream/output", exist_ok=True)
     output_path = "stream/output/citibike_multi_dir_output.txt"
+    singleFileStream = CSVFileInputStream("data/2013-citibike-tripdata/201306-citibike-tripdata.csv", formatter, has_header=True)
 
     with open(output_path, 'w') as f:
         count = 0
         current_file = None
         
-        for line in input_stream:
+        for line in singleFileStream:
             try:
                 parsed = formatter.parse_event(line)
                 if parsed is None:

@@ -18,7 +18,7 @@ citibikeEventDirectories = [
 ]
 CITIBIKE_DATA_FORMATTER = CitiBikeDataFormatter(CitiBikeEventTypeClassifier())  
 citibikeEventStream = MultiDirectoryCSVStream(citibikeEventDirectories, "*.csv", CITIBIKE_DATA_FORMATTER, has_header=True)
-singleCitibikeEventStream = CSVFileInputStream("data/2013-citibike-tripdata/201306-citibike-tripdata.csv", CITIBIKE_DATA_FORMATTER, has_header=True)
+singleCitibikeEventStream = CSVFileInputStream("data/2013-citibike-tripdata/short-tripdata.csv", CITIBIKE_DATA_FORMATTER, has_header=True)
 
 
 def hotpathPatternSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
@@ -53,7 +53,7 @@ def hotpathPatternSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT
 
     runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=citibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
 
-def citibikeBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
+def citibikeKCBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
                             test_name = "citibike"):
     """
     PATTERN SEQ (BikeTrip a)
@@ -69,7 +69,23 @@ def citibikeBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_
         timedelta(hours=1)
     )
 
-    runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=citibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
+    runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=singleCitibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
+
+def citibikeBasicSearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
+                            test_name = "citibike"):
+    """
+    PATTERN SEQ (BikeTrip a)
+    WHERE a.usertype = Customer
+    WITHIN 1h
+    """
+
+    pattern = Pattern(
+        SeqOperator(PrimitiveEventStructure("BikeTrip", "a")),
+        EqCondition(Variable("a", lambda x: x["usertype"]), "Customer"),
+        timedelta(hours=1)
+    )
+
+    runTest(test_name, [pattern], createTestFile, eval_mechanism_params, eventStream=singleCitibikeEventStream, data_formatter=CITIBIKE_DATA_FORMATTER)
 
 def oneArgumentsearchTest(createTestFile=False, eval_mechanism_params=DEFAULT_TESTING_EVALUATION_MECHANISM_SETTINGS,
                           test_name = "one"):

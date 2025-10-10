@@ -61,6 +61,10 @@ class TreeBasedEvaluationMechanism(EvaluationMechanism, ABC):
         last_statistics_refresh_time = None
 
         for raw_event in events:
+            parsed = data_formatter.parse_event(raw_event)
+            if parsed is None:
+                #Skipping header row
+                continue
             event = Event(raw_event, data_formatter)
             if event.type not in self._event_types_listeners:
                 continue
