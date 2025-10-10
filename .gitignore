@@ -1,7 +1,8 @@
 myenv/*
 requirement/
 *.pyc
-data/*
+data/2013-citibike-tripdata/2013*
+data/2025*
 stream/output/*
 ouput/*
 .vscode/*
